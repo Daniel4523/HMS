@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7f8">
+  <title>SaludIntegral | Gestión hospitalaria</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main id="login-screen" class="login-layout">
+    <section class="login-card">
+      <div class="brand-mark">S</div>
+      <p class="eyebrow">SALUDINTEGRAL HMS</p>
+      <h1>Bienvenido</h1>
+      <p class="muted">Ingresa con tu cuenta para continuar.</p>
+      <form id="login-form" class="form-stack">
+        <label>Usuario<input name="login" autocomplete="username" required minlength="3"></label>
+        <label>Contraseña<input name="clave" type="password" autocomplete="current-password" required minlength="6"></label>
+        <button class="button primary full" type="submit">Iniciar sesión</button>
+      </form>
+      <p id="login-error" class="message error" role="alert"></p>
+    </section>
+    <p class="login-footnote">Sistema de gestión hospitalaria</p>
+  </main>
+
+  <div id="app-screen" class="app-shell" hidden>
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="SaludIntegral inicio">
+        <span class="brand-mark small">S</span>
+        <span><strong>SaludIntegral</strong><small>Gestión hospitalaria</small></span>
+      </a>
+      <p class="nav-caption">MENÚ PRINCIPAL</p>
+      <nav id="navigation" class="navigation" aria-label="Navegación principal"></nav>
+      <div class="sidebar-bottom">
+        <div class="user-badge"><span class="avatar">U</span><span><strong id="user-name"></strong><small id="user-role"></small></span></div>
+        <button id="logout-button" class="button quiet full" type="button">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><p class="eyebrow">PANEL DE GESTIÓN</p><h1 id="page-title">Resumen</h1></div>
+        <span id="today-label" class="today-label"></span>
+      </header>
+      <div id="global-message" class="message" role="status" aria-live="polite"></div>
+
+      <section id="section-inicio" class="page-section">
+        <div class="welcome-card">
+          <div><p class="eyebrow light">CENTRO DE OPERACIONES</p><h2>Hola, <span id="welcome-user"></span></h2><p>Administra la atención desde un solo lugar.</p></div>
+          <div class="welcome-icon" aria-hidden="true">✚</div>
+        </div>
+        <div class="section-heading"><div><p class="eyebrow">ACCESOS</p><h2>¿Qué necesitas hacer?</h2></div></div>
+        <div id="quick-links" class="quick-grid"></div>
+        <div class="info-card"><span class="status-dot"></span><span>Conectado al sistema SaludIntegral</span><a href="/docs" target="_blank" rel="noreferrer">Documentación de la API ↗</a></div>
+      </section>
+
+      <section id="section-pacientes" class="page-section" hidden>
+        <div class="section-heading"><div><p class="eyebrow">DIRECTORIO</p><h2>Pacientes</h2><p class="muted">Busca por nombre o número de documento.</p></div></div>
+        <div class="panel">
+          <form id="search-patient-form" class="search-row">
+            <label class="sr-only" for="patient-query">Nombre o documento</label>
+            <input id="patient-query" name="q" placeholder="Ej. María o 10203040" minlength="3" required>
+            <button class="button primary" type="submit">Buscar pacientes</button>
+          </form>
+          <div id="patient-results" class="results-list"><p class="empty-state">Escribe al menos 3 caracteres para buscar.</p></div>
+        </div>
+        <details id="new-patient-panel" class="panel collapsible" hidden>
+          <summary><span><strong>Registrar paciente</strong><small>Crear ficha y abrir su historia clínica</small></span><span class="plus">+</span></summary>
+          <form id="new-patient-form" class="form-grid">
+            <label>Tipo de documento<select name="tipo_doc" required><option value="CC">Cédula (CC)</option><option value="TI">Tarjeta de identidad (TI)</option><option value="CE">Cédula de extranjería (CE)</option><option value="RC">Registro civil (RC)</option><option value="PA">Pasaporte (PA)</option></select></label>
+            <label>Número de documento<input name="num_doc" minlength="4" maxlength="20" required></label>
+            <label>Nombres<input name="nombres" minlength="2" required></label>
+            <label>Apellidos<input name="apellidos" minlength="2" required></label>
+            <label>Fecha de nacimiento<input name="fecha_nac" type="date" required></label>
+            <label>Teléfono<input name="telefono" type="tel" minlength="7" maxlength="20" required></label>
+            <label>Correo electrónico<input name="correo" type="email"></label>
+            <label>EPS<input name="eps" required></label>
+            <label>Régimen<select name="regimen" required><option value="CONTRIBUTIVO">Contributivo</option><option value="SUBSIDIADO">Subsidiado</option><option value="ESPECIAL">Especial</option><option value="PARTICULAR">Particular</option></select></label>
+            <div class="form-actions"><button class="button primary" type="submit">Guardar paciente</button></div>
+          </form>
+        </details>
+      </section>
+
+      <section id="section-citas" class="page-section" hidden>
+        <div class="section-heading"><div><p class="eyebrow">AGENDA</p><h2>Agendar una cita</h2><p class="muted">Busca y selecciona al paciente antes de completar la cita.</p></div></div>
+        <div class="panel">
+          <form id="appointment-patient-search" class="search-row">
+            <label class="sr-only" for="appointment-patient-query">Buscar paciente</label>
+            <input id="appointment-patient-query" name="q" placeholder="Nombre o número de documento" minlength="3" required>
+            <button class="button secondary" type="submit">Buscar paciente</button>
+          </form>
+          <div id="appointment-patient-results" class="results-list compact"></div>
+          <p id="selected-patient" class="selected-patient"></p>
+        </div>
+        <form id="appointment-form" class="panel form-grid" hidden>
+          <label>Médico<select name="id_medico" id="doctor-select" required><option value="">Selecciona un médico</option></select></label>
+          <label>Consultorio<input name="consultorio" required placeholder="Ej. 204"></label>
+          <label>Inicio<input name="inicio" type="datetime-local" required></label>
+          <label>Fin<input name="fin" type="datetime-local" required></label>
+          <div class="form-actions"><button class="button primary" type="submit">Confirmar cita</button></div>
+        </form>
+      </section>
+
+      <section id="section-medicos" class="page-section" hidden>
+        <div class="section-heading"><div><p class="eyebrow">EQUIPO MÉDICO</p><h2>Médicos</h2><p class="muted">Registra profesionales para habilitarlos en la agenda.</p></div></div>
+        <form id="new-doctor-form" class="panel form-grid">
+          <label>Nombre completo<input name="nombre" required minlength="2"></label>
+          <label>Especialidad<input name="especialidad" required></label>
+          <label>Sede<input name="sede" required></label>
+          <div class="form-actions"><button class="button primary" type="submit">Registrar médico</button></div>
+        </form>
+        <div id="doctor-results" class="panel results-list"><p class="empty-state">Cargando médicos…</p></div>
+      </section>
+
+      <section id="section-usuarios" class="page-section" hidden>
+        <div class="section-heading"><div><p class="eyebrow">ACCESO AL SISTEMA</p><h2>Crear usuario</h2><p class="muted">Crea cuentas para el personal y asigna un rol.</p></div></div>
+        <form id="new-user-form" class="panel form-grid">
+          <label>Nombre de usuario<input name="login" minlength="3" maxlength="50" autocomplete="off" required></label>
+          <label>Contraseña temporal<input name="clave" type="password" minlength="8" autocomplete="new-password" required></label>
+          <label>Rol<select name="rol" required><option value="admisiones">Admisiones</option><option value="medico">Médico</option><option value="enfermeria">Enfermería</option><option value="admin">Administrador</option></select></label>
+          <div class="form-actions"><button class="button primary" type="submit">Crear usuario</button></div>
+        </form>
+      </section>
+
+      <section id="section-historia" class="page-section" hidden>
+        <div class="section-heading"><div><p class="eyebrow">ATENCIÓN CLÍNICA</p><h2>Historia clínica</h2><p class="muted">Busca al paciente por documento y revisa sus evoluciones.</p></div></div>
+        <div class="panel">
+          <form id="history-search-form" class="search-row">
+            <label class="sr-only" for="history-patient-query">Buscar paciente</label>
+            <input id="history-patient-query" name="q" placeholder="Nombre o número de documento" minlength="3" required>
+            <button class="button secondary" type="submit">Buscar paciente</button>
+          </form>
+          <div id="history-patient-results" class="results-list compact"></div>
+        </div>
+        <div id="history-content"></div>
+      </section>
+
+      <section id="section-auditoria" class="page-section" hidden>
+        <div class="section-heading"><div><p class="eyebrow">SEGURIDAD</p><h2>Actividad reciente</h2><p class="muted">Registro de acciones realizadas en el sistema.</p></div></div>
+        <div id="audit-results" class="panel results-list"><p class="empty-state">Cargando actividad…</p></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: hms
+      POSTGRES_PASSWORD: hms
+      POSTGRES_DB: hms
+    volumes:
+      - datos:/var/lib/postgresql/data
+  api:
+    build: ./backend
+    env_file: .env
+    depends_on: [db]
+    ports:
+      - "8000:8000"
+volumes:
+  datos:
